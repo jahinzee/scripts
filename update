@@ -1,0 +1,38 @@
+#!/bin/sh
+
+# update - a somewhat-comprehensive Linux system upgrader. Intended for use on
+# Linux desktop installations. Upgrades distrobox containers, Flatpaks, and
+# system packages with PackageKit.
+# 
+# Written by Jahin Z. <jahinzee@outlook.com>
+# 
+# To the extent possible under law, the author(s) have dedicated all copyright
+# and related and neighboring rights to this software to the public domain
+# worldwide. This software is distributed without any warranty.
+#
+# You should have received a copy of the CC0 Public Domain Dedication along
+# with this software. If not, see
+# <http://creativecommons.org/publicdomain/zero/1.0/>. 
+
+
+# * USE_OFFLINE_UPDATE
+#   set to `false` to apply system updates live, set to `true` to defer system
+#   updates until next boot.
+USE_OFFLINE_UPDATE=true
+
+
+command -v flatpak &> /dev/null &&
+    flatpak update -y
+
+command -v distrobox &> /dev/null &&
+    distrobox upgrade --all
+
+if "$USE_OFFLINE_UPDATE"; then
+    command -v pkcon &> /dev/null &&
+        pkcon update -d -y;
+    pkcon offline-trigger &> /dev/null &&
+        echo ":: System packages will be upgraded on next boot.";
+else
+    command -v pkcon &> /dev/null &&
+        pkcon update -y;
+fi
