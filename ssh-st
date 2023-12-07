@@ -1,0 +1,43 @@
+#!/usr/bin/sh
+
+# ssh-st - initialise an SSH connection while also exposing ports for
+# Syncthing. Can be modified for use with any ports and applications that uses
+# a web portal. Pass in any additional arguments, including the SSH server;
+# these will be passed along to `ssh`.
+# 
+# Written by Jahin Z. <jahinzee@outlook.com>
+# 
+# To the extent possible under law, the author(s) have dedicated all copyright
+# and related and neighboring rights to this software to the public domain
+# worldwide. This software is distributed without any warranty.
+#
+# You should have received a copy of the CC0 Public Domain Dedication along
+# with this software. If not, see
+# <http://creativecommons.org/publicdomain/zero/1.0/>. 
+
+
+# * APP_NAME
+#   Name of application that the port exposes. For labelling.
+APP_NAME="Syncthing console"
+
+# * SERVER_PORT
+#   Port on server to expose.
+SERVER_PORT=8384
+
+# * CLIENT_PORT
+#   Port on client to map SERVER_PORT onto.
+CLIENT_PORT=9384
+
+# * INTERACTIVE
+#   Set to `true` to leave shell open; set to `false` to display a pause
+#   prompt.
+INTERACTIVE=false
+
+
+if "$INTERACTIVE"; then
+    ssh -L "$CLIENT_PORT:127.0.0.1:$SERVER_PORT" "$@";
+else
+    ssh -L "$CLIENT_PORT:127.0.0.1:$SERVER_PORT" "$@" -- \
+    "echo -e \"Access $APP_NAME with <http://127.0.0.1:$CLIENT_PORT>.\n\
+Press any key to stop.\"; read -p \"\" -n1 -s";
+fi
